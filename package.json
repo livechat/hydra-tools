@@ -24,6 +24,10 @@
       "email": "a.cobo@text.com"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/livechat/hydra-tools.git"
+  },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@faker-js/faker": "^9.2.0",
