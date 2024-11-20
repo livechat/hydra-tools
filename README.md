@@ -64,7 +64,7 @@ const axiosInstance = axios.create();
 const removeInterceptor = withHydraInterceptor(axiosInstance, {
   hydraClient, // Your configured HydraClient instance
   target: 'your-target',
-  runWhen: (config) => true // Optional condition for when to apply the interceptor
+  runWhen: (config) => true 
 });
 
 // Later, if needed, remove the interceptor
@@ -74,7 +74,7 @@ removeInterceptor();
 The interceptor will automatically:
 - Add the Hydra authentication token as 'X-Authorization' header
 - Handle token refresh when needed
-- Allow conditional application through the `runWhen` option
+- Allow conditional application through the `runWhen` option, which is a function that receives the axios request config and should return a boolean
 
 ## Token Management
 
