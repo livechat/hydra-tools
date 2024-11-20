@@ -1,4 +1,4 @@
-# Hydra Client
+# Hydra Tools
 
 A lightweight TypeScript client for handling OAuth2 token management with Hydra authentication server.
 
@@ -7,6 +7,7 @@ A lightweight TypeScript client for handling OAuth2 token management with Hydra 
 - Automatic token caching
 - Token refresh management for different targets/audiences
 - Error handling with optional logging
+- Uses [axios](https://github.com/axios/axios) for requests
 
 ## Usage
 ``` typescript
@@ -29,7 +30,7 @@ const authHeader = await client.getAuthHeaderForTarget('your-target');
 
 If acquiring the hydra token fails and the client does not have a valid token cached, the client will throw an error. Internally the library uses `axios` and will propagate the `AxiosError` to the caller. You can check that it is indeed an axios error calling `axios.isAxiosError`.
 
-## Configuration
+### Configuration
 
 The `HydraConfig` interface accepts the following parameters:
 
@@ -47,6 +48,10 @@ timeout?: number; // Request timeout in milliseconds (default: 5000)
 ### Optional Logging
 
 The client accepts an optional logger that must implement an error method, and it will log errors that occur during token acquisition. 
+
+
+### Request Intercepot for axios
+
 
 ## Token Management
 
