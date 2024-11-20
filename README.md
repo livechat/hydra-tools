@@ -50,8 +50,31 @@ timeout?: number; // Request timeout in milliseconds (default: 5000)
 The client accepts an optional logger that must implement an error method, and it will log errors that occur during token acquisition. 
 
 
-### Request Intercepot for axios
+### Request Interceptor for axios
 
+The package provides a convenient axios interceptor that automatically adds Hydra authentication headers to your requests. Here's how to use it:
+
+```typescript
+import { withHydraInterceptor } from '@livechat/hydra-tools';
+import axios from 'axios';
+
+const axiosInstance = axios.create();
+
+// Add the interceptor
+const removeInterceptor = withHydraInterceptor(axiosInstance, {
+  hydraClient, // Your configured HydraClient instance
+  target: 'your-target',
+  runWhen: (config) => true // Optional condition for when to apply the interceptor
+});
+
+// Later, if needed, remove the interceptor
+removeInterceptor();
+```
+
+The interceptor will automatically:
+- Add the Hydra authentication token as 'X-Authorization' header
+- Handle token refresh when needed
+- Allow conditional application through the `runWhen` option
 
 ## Token Management
 
