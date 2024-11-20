@@ -27,7 +27,7 @@ describe("withHydraInterceptor", () => {
     } as unknown as HydraClient;
 
     axiosInstance = axios.create();
-    const runWhen = (config: AxiosRequestConfig) => config.headers?.["X-Use-Hydra"] === true;
+    const runWhen = (config: AxiosRequestConfig) => config.headers?.["X-Use-Hydra"] === "yes";
 
     withHydraInterceptor(axiosInstance, { hydraClient, target: hydraTarget, runWhen });
   });
@@ -45,8 +45,8 @@ describe("withHydraInterceptor", () => {
       headers = request.headers;
     });
 
-    await axiosInstance.get("/hydra-endpoint", {
-      headers: { "X-Use-Hydra": true },
+    await axiosInstance.get("http://server/hydra-endpoint", {
+      headers: { "X-Use-Hydra": "yes" },
     });
 
     expect(headers).toBeDefined();
@@ -59,7 +59,7 @@ describe("withHydraInterceptor", () => {
       headers = request.headers;
     });
 
-    await axiosInstance.get("/hydra-endpoint");
+    await axiosInstance.get("http://server/hydra-endpoint");
 
     expect(headers).toBeDefined();
     expect(headers!.get("X-Authorization")).toBeNull();
@@ -68,8 +68,8 @@ describe("withHydraInterceptor", () => {
   it("should call hydra with the correct target", async () => {
     const hydraSpy = jest.spyOn(hydraClient, "getAuthHeaderForTarget");
 
-    await axiosInstance.get("/hydra-endpoint", {
-      headers: { "X-Use-Hydra": true },
+    await axiosInstance.get("http://server/hydra-endpoint", {
+      headers: { "X-Use-Hydra": "yes" },
     });
 
     expect(hydraSpy).toHaveBeenCalledWith(hydraTarget);
