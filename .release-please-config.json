@@ -1,8 +1,0 @@
-{
-  "branches": [
-    {
-      "branch": "development",
-      "releaseType": "node"
-    }
-  ]
-}
