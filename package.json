@@ -1,5 +1,5 @@
 {
-  "name": "hydra-tools",
+  "name": "@livechat/hydra-tools",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
