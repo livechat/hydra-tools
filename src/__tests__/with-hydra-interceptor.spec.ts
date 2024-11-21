@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { http, HttpResponse } from "msw";
 import { setupServer, SetupServerApi } from "msw/node";
@@ -45,11 +44,12 @@ describe("withHydraInterceptor", () => {
       headers = request.headers;
     });
 
-    await axiosInstance.get("http://server/hydra-endpoint", {
+    await axiosInstance.get("http://example.com/hydra-endpoint", {
       headers: { "X-Use-Hydra": "yes" },
     });
 
     expect(headers).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(headers!.get("X-Authorization")).toBe(hydraToken);
   });
 
@@ -59,16 +59,17 @@ describe("withHydraInterceptor", () => {
       headers = request.headers;
     });
 
-    await axiosInstance.get("http://server/hydra-endpoint");
+    await axiosInstance.get("http://example.com/hydra-endpoint");
 
     expect(headers).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(headers!.get("X-Authorization")).toBeNull();
   });
 
   it("should call hydra with the correct target", async () => {
     const hydraSpy = jest.spyOn(hydraClient, "getAuthHeaderForTarget");
 
-    await axiosInstance.get("http://server/hydra-endpoint", {
+    await axiosInstance.get("http://example.com/hydra-endpoint", {
       headers: { "X-Use-Hydra": "yes" },
     });
 

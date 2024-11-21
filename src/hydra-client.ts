@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 import { HydraConfig, HydraLogger, HydraToken, HydraTokenResponse } from "./interfaces";
+import { getErrorMessage } from "./utils";
 
 const mustRefreshToken = (token: HydraToken): boolean => {
   return token.refreshIn < Date.now();
@@ -76,18 +77,3 @@ export class HydraClient {
     }
   }
 }
-
-const getErrorMessage = (error: unknown): string => {
-  if (axios.isAxiosError(error)) {
-    try {
-      return JSON.stringify(error.response?.data);
-    } catch {
-      return error.message;
-    }
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return String(error);
-};

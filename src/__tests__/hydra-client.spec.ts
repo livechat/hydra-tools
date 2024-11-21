@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { faker } from "@faker-js/faker";
 import { AxiosError } from "axios";
 import { http, HttpResponse } from "msw";
@@ -8,7 +7,7 @@ import { HydraClient } from "../hydra-client";
 import { HydraConfig, HydraTokenResponse } from "../interfaces";
 
 const HYDRA_CONFIG: HydraConfig = {
-  url: "http://hydra",
+  url: "http://example.com/hydra",
   clientId: `client-id-${new Date().toISOString()}`,
   clientSecret: `client-secret-${new Date().toISOString()}`,
 };
@@ -16,7 +15,7 @@ const HYDRA_CONFIG: HydraConfig = {
 const EXPIRES_IN = 60 * 60; // 1 hour in seconds
 
 const EXPIRATION_TIME_MS = EXPIRES_IN * 1000 + 1;
-const REFRESH_TIME_MS = EXPIRATION_TIME_MS / 2;
+const REFRESH_TIME_MS = EXPIRATION_TIME_MS / 2 + 1;
 
 const makeHydraTokenResponse = (): HydraTokenResponse => ({
   access_token: faker.string.alphanumeric(10),
@@ -53,7 +52,7 @@ describe("HydraClient", () => {
   });
 
   it("should fetch and return a token when the cache is empty", async () => {
-    let hydraRequest: Request;
+    let hydraRequest: Request | undefined;
     server.events.on("request:end", ({ request }) => {
       hydraRequest = request;
     });
@@ -61,7 +60,7 @@ describe("HydraClient", () => {
     const authHeader = await hydraClient.getAuthHeaderForTarget("test-target");
 
     expect(authHeader).toMatch(/^Bearer .+$/);
-    await expectRequestToBeHydraTokenRequest(hydraRequest!, "test-target");
+    await expectRequestToBeHydraTokenRequest(hydraRequest, "test-target");
   });
 
   it("should return the cached token when it is present and not requiring refresh", async () => {
@@ -83,7 +82,7 @@ describe("HydraClient", () => {
 
     const firstHeader = await hydraClient.getAuthHeaderForTarget("test-target");
 
-    jest.advanceTimersByTime(REFRESH_TIME_MS * 1000 + 1);
+    jest.advanceTimersByTime(REFRESH_TIME_MS);
 
     const secondHeader = await hydraClient.getAuthHeaderForTarget("test-target");
 
@@ -106,7 +105,12 @@ describe("HydraClient", () => {
     jest.advanceTimersByTime(REFRESH_TIME_MS);
 
     server.use(
-      http.post(`${HYDRA_CONFIG.url}/oauth2/token`, () => HttpResponse.json({}, { status: 500 })),
+      http.post(`${HYDRA_CONFIG.url}/oauth2/token`, () =>
+        HttpResponse.json(
+          { error: "server_error", error_description: "Internal Server Error" },
+          { status: 500 },
+        ),
+      ),
     );
 
     const secondHeader = await hydraClient.getAuthHeaderForTarget("test-target");
@@ -147,7 +151,12 @@ describe("HydraClient", () => {
     jest.advanceTimersByTime(EXPIRATION_TIME_MS);
 
     server.use(
-      http.post(`${HYDRA_CONFIG.url}/oauth2/token`, () => HttpResponse.json({}, { status: 500 })),
+      http.post(`${HYDRA_CONFIG.url}/oauth2/token`, () =>
+        HttpResponse.json(
+          { error: "server_error", error_description: "Internal Server Error" },
+          { status: 500 },
+        ),
+      ),
     );
 
     await expect(() => hydraClient.getAuthHeaderForTarget("test-target")).rejects.toBeInstanceOf(
@@ -157,13 +166,13 @@ describe("HydraClient", () => {
 });
 
 const expectRequestToBeHydraTokenRequest = async (
-  request: Request,
+  request: Request | undefined,
   target: string,
 ): Promise<void> => {
   expect(request).toBeDefined();
   expect(request).toHaveProperty("url", `${HYDRA_CONFIG.url}/oauth2/token`);
 
-  const body = new TextDecoder().decode((await request.body?.getReader().read())?.value);
+  const body = new TextDecoder().decode((await request?.body?.getReader().read())?.value);
 
   expect(body).toContain(`grant_type=client_credentials&audience=${target}`);
 };

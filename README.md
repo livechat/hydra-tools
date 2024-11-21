@@ -19,7 +19,7 @@ const config: HydraConfig = {
     clientId: 'YOUR_CLIENT_ID',
     clientSecret: 'YOUR_CLIENT_SECRET',
     timeout: 5000 // optional, defaults to 5000ms
-    };
+};
 
 const client = new HydraClient(config);
 
@@ -37,12 +37,19 @@ The `HydraConfig` interface accepts the following parameters:
 
 ``` typescript 
 interface HydraConfig {
-url: string; // Hydra server URL
-clientId: string; // OAuth2 client ID
-clientSecret: string; // OAuth2 client secret
-timeout?: number; // Request timeout in milliseconds (default: 5000)
+  url: string; // Hydra server URL
+  clientId: string; // OAuth2 client ID
+  clientSecret: string; // OAuth2 client secret
+  timeout?: number; // Request timeout in milliseconds (default: 5000)
 }
 ```
+
+### Token Management
+
+The client automatically handles:
+- Token caching per target
+    - Automatic refresh after half of the token's lifetime to avoid probems with Hydra's server downtime
+    - Fallback to cached tokens during failed refresh attempts
 
 
 ### Optional Logging
@@ -52,11 +59,11 @@ The client accepts an optional logger that must implement an error method, and i
 
 ### Request Interceptor for axios
 
-The package provides a convenient axios interceptor that automatically adds Hydra authentication headers to your requests. Here's how to use it:
+The package provides a convenient axios interceptor that automatically adds `X-Authorization` header to your requests with the Hydra token. Here's how to use it:
 
 ```typescript
 import { withHydraInterceptor } from '@livechat/hydra-tools';
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const axiosInstance = axios.create();
 
@@ -64,7 +71,7 @@ const axiosInstance = axios.create();
 const removeInterceptor = withHydraInterceptor(axiosInstance, {
   hydraClient, // Your configured HydraClient instance
   target: 'your-target',
-  runWhen: (config) => true 
+  runWhen: (config: InternalAxiosRequestConfig) => config.headers['X-Region'] !== 'some-region',
 });
 
 // Later, if needed, remove the interceptor
@@ -75,13 +82,6 @@ The interceptor will automatically:
 - Add the Hydra authentication token as 'X-Authorization' header
 - Handle token refresh when needed
 - Allow conditional application through the `runWhen` option, which is a function that receives the axios request config and should return a boolean
-
-## Token Management
-
-The client automatically handles:
-- Token caching per target
-- Automatic refresh after half of the token's lifetime to avoid probems with Hydra's server downtime
-- Fallback to cached tokens during failed refresh attempts
 
 ## Internal Use Only
 
