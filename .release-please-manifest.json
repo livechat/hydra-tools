@@ -1,8 +1,3 @@
 {
-  "branches": [
-    {
-      "branch": "development",
-      "releaseType": "node"
-    }
-  ]
+  ".": "16.15.0"
 }
