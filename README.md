@@ -69,6 +69,7 @@ const axiosInstance = axios.create();
 
 // Add the interceptor
 const removeInterceptor = withHydraInterceptor(axiosInstance, {
+  authHeader, // Optional, defaults to "Proxy-Authorization"
   hydraClient, // Your configured HydraClient instance
   target: 'your-target',
   runWhen: (config: InternalAxiosRequestConfig) => config.headers['X-Region'] !== 'some-region',

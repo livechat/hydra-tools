@@ -5,10 +5,12 @@ import { HydraClient } from "./hydra-client";
 export const withHydraInterceptor = (
   axiosInstance: AxiosInstance,
   {
+    authHeader = "Proxy-Authorization",
     hydraClient,
     target,
     runWhen,
   }: {
+    authHeader?: string;
     hydraClient: HydraClient;
     target: string;
     runWhen: NonNullable<AxiosInterceptorOptions["runWhen"]>;
@@ -18,7 +20,7 @@ export const withHydraInterceptor = (
     async (config) => {
       const token = await hydraClient.getAuthHeaderForTarget(target);
 
-      config.headers["X-Authorization"] = token;
+      config.headers[authHeader] = token;
 
       return config;
     },

@@ -38,7 +38,7 @@ describe("withHydraInterceptor", () => {
     server.close();
   });
 
-  it("should add X-Authorization when the conditions are met", async () => {
+  it("should add Proxy-Authorization when the conditions are met", async () => {
     let headers: Headers | null = null;
     server.events.on("request:start", ({ request }) => {
       headers = request.headers;
@@ -50,10 +50,10 @@ describe("withHydraInterceptor", () => {
 
     expect(headers).toBeDefined();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(headers!.get("X-Authorization")).toBe(hydraToken);
+    expect(headers!.get("Proxy-Authorization")).toBe(hydraToken);
   });
 
-  it("should not add X-Authorization when the conditions are not met", async () => {
+  it("should not add Proxy-Authorization when the conditions are not met", async () => {
     let headers: Headers | null = null;
     server.events.on("request:start", ({ request }) => {
       headers = request.headers;
@@ -63,7 +63,7 @@ describe("withHydraInterceptor", () => {
 
     expect(headers).toBeDefined();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(headers!.get("X-Authorization")).toBeNull();
+    expect(headers!.get("Proxy-Authorization")).toBeNull();
   });
 
   it("should call hydra with the correct target", async () => {
